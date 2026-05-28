@@ -172,33 +172,55 @@ export const updateEvent = async (
       });
     }
 
-    // 🔥 OWNER CHECK
+    // OWNER CHECK
     if (event.organizer_id !== user.id) {
       return res.status(403).json({
         message: "Forbidden",
       });
     }
 
+    const {
+      title,
+      description,
+      start_date,
+      end_date,
+      category,
+      location,
+      venue_name,
+      venue_address,
+      latitude,
+      longitude,
+    } = req.body;
+
     const updated = await prisma.events.update({
       where: { id },
       data: {
-        ...req.body,
-        start_date: req.body.start_date
-          ? new Date(req.body.start_date)
+        title,
+        description,
+        category,
+        location,
+        venue_name,
+        venue_address,
+        latitude,
+        longitude,
+        start_date: start_date
+          ? new Date(start_date)
           : undefined,
-        end_date: req.body.end_date
-          ? new Date(req.body.end_date)
+        end_date: end_date
+          ? new Date(end_date)
           : undefined,
       },
     });
 
     res.status(200).json({
-      message: "Event updated",
+      message: "Event updated successfully",
       data: updated,
     });
   } catch (error: any) {
+    console.error(error);
+
     res.status(500).json({
-      message: error.message,
+      message: error.message || "Failed to update event",
     });
   }
 };
